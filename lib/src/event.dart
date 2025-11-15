@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
+import 'package:flutter_notification_listener_plus/flutter_notification_listener_plus.dart';
 
 /// ActionInput is the remote inputs for action
 class ActionInput {
