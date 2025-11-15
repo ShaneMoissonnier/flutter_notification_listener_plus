@@ -1,3 +1,9 @@
+## 1.3.6
+
+- Fixed Android Gradle Plugin compatibility by adding namespace to build.gradle
+- Fixed package name references (flutter_notification_listener → flutter_notification_listener_plus)
+- Updated SDK constraint to support Dart 3.x
+
 ## 1.3.5
 
 - **BREAKING FIX**: Fixed Android 13-16+ compatibility issue with broadcast receiver registration
