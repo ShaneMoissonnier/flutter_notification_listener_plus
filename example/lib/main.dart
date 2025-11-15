@@ -34,6 +34,7 @@ class NotificationsLog extends StatefulWidget {
   _NotificationsLogState createState() => _NotificationsLogState();
 }
 
+@pragma('vm:entry-point')
 class _NotificationsLogState extends State<NotificationsLog> {
   List<NotificationEvent> _log = [];
   bool started = false;

@@ -3,6 +3,8 @@
 - Fixed Android Gradle Plugin compatibility by adding namespace to build.gradle
 - Fixed package name references (flutter_notification_listener → flutter_notification_listener_plus)
 - Updated SDK constraint to support Dart 3.x
+- Fixed JVM target compatibility issue (Java 1.8 vs Kotlin 21 mismatch)
+- Added compileOptions and kotlinOptions to ensure consistent JVM target
 
 ## 1.3.5
 
