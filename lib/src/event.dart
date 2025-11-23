@@ -235,6 +235,12 @@ class NotificationEvent {
   Future<dynamic> getFull() {
     return NotificationsListener.getFullNotification(uniqueId!);
   }
+
+  /// cancel the notification
+  /// this will dismiss the notification from the status bar
+  Future<bool> cancel() {
+    return NotificationsListener.cancelNotification(uniqueId!);
+  }
 }
 
 /// newEvent package level function create event from map

@@ -154,6 +154,14 @@ class NotificationsListener {
         .invokeMethod<dynamic>("service.get_full_notification", [uid]);
   }
 
+  /// cancel a notification by its unique id
+  /// this will dismiss the notification from the status bar
+  static Future<bool> cancelNotification(String uid) async {
+    return await _bgMethodChannel
+            .invokeMethod<bool>("service.cancel", [uid]) ??
+        false;
+  }
+
   static void _defaultCallbackHandle(NotificationEvent evt) {
     final SendPort? _send = IsolateNameServer.lookupPortByName(SEND_PORT_NAME);
     print("[default callback handler] [send isolate nameserver]");

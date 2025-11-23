@@ -89,6 +89,12 @@ class NotificationsHandlerService: MethodChannel.MethodCallHandler, Notification
               }
               return result.success(Utils.Marshaller.marshal(eventsCache[uid]?.mSbn))
           }
+          "service.cancel" -> {
+              Log.d(TAG, "cancel notification")
+              val args = call.arguments<ArrayList<*>?>()
+              val uid = args!![0]!! as String
+              return result.success(cancelNotificationByUid(uid))
+          }
           else -> {
               Log.d(TAG, "unknown method ${call.method}")
               result.notImplemented()
@@ -319,6 +325,23 @@ class NotificationsHandlerService: MethodChannel.MethodCallHandler, Notification
             return true
         } else {
             Log.e(TAG, "not implement :sdk < KITKAT_WATCH")
+            return false
+        }
+    }
+
+    private fun cancelNotificationByUid(uid: String): Boolean {
+        Log.d(TAG, "cancel notification: $uid")
+        if (!eventsCache.containsKey(uid)) {
+            Log.d(TAG, "notification is not exits: $uid")
+            return false
+        }
+        val n = eventsCache[uid] ?: return false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cancelNotification(n.mSbn.key)
+            Log.d(TAG, "notification cancelled successfully: $uid")
+            return true
+        } else {
+            Log.e(TAG, "cancelNotification requires API 21+")
             return false
         }
     }

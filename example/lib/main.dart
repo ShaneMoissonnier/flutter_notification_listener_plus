@@ -189,6 +189,16 @@ class _NotificationsLogState extends State<NotificationsLog> {
                                     } catch (e) {
                                       print(e);
                                     }
+                                  }))
+                              ..add(TextButton(
+                                  child: Text("Cancel"),
+                                  onPressed: () async {
+                                    try {
+                                      var success = await entry.cancel();
+                                      print("notification cancelled: $success");
+                                    } catch (e) {
+                                      print("error cancelling notification: $e");
+                                    }
                                   })),
                           ),
                           Text(entry.createAt.toString().substring(0, 19)),
