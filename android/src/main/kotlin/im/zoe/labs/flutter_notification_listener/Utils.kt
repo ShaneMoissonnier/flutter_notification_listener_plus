@@ -329,17 +329,15 @@ class Utils {
 
             fun fromString(str: String = "{}"): PromoteServiceConfig {
                 val cfg = PromoteServiceConfig()
-                val map = JSONObject(str)
-                map.let { m ->
-                    try {
-                        m["foreground"].let { cfg.foreground = it as Boolean? }
-                        m["title"].let { cfg.title = it as String? }
-                        m["subTitle"].let { cfg.subTitle = it as String? }
-                        m["description"].let { cfg.description = it as String? }
-                        m["showWhen"].let { cfg.showWhen = it as Boolean? }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+                try {
+                    val map = JSONObject(str)
+                    cfg.foreground = map.optBoolean("foreground", true)
+                    cfg.title = if (map.has("title")) map.getString("title") else "Flutter Notification Listener"
+                    cfg.subTitle = if (map.has("subTitle")) map.getString("subTitle") else null
+                    cfg.description = if (map.has("description")) map.getString("description") else "Let's scraping the notifications ..."
+                    cfg.showWhen = map.optBoolean("showWhen", false)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error parsing config from string: $str", e)
                 }
                 return cfg
             }
