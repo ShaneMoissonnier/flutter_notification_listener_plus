@@ -20,6 +20,7 @@ import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
@@ -379,20 +380,28 @@ class NotificationsHandlerService: MethodChannel.MethodCallHandler, Notification
         const val NOTIFICATION_INTENT = "notification_event"
 
         fun permissionGiven(context: Context): Boolean {
-            val packageName = context.packageName
-            val flat = Settings.Secure.getString(context.contentResolver, ENABLED_NOTIFICATION_LISTENERS)
-            if (!TextUtils.isEmpty(flat)) {
-                val names = flat.split(":").toTypedArray()
-                for (name in names) {
-                    val componentName = ComponentName.unflattenFromString(name)
-                    val nameMatch = TextUtils.equals(packageName, componentName?.packageName)
-                    if (nameMatch) {
-                        return true
-                    }
-                }
-            }
+            // val packageName = context.packageName
+            // val flat = Settings.Secure.getString(context.contentResolver, ENABLED_NOTIFICATION_LISTENERS)
+            // if (!TextUtils.isEmpty(flat)) {
+            //     val names = flat.split(":").toTypedArray()
+            //     for (name in names) {
+            //         val componentName = ComponentName.unflattenFromString(name)
+            //         val nameMatch = TextUtils.equals(packageName, componentName?.packageName)
+            //         if (nameMatch) {
+            //             return true
+            //         }
+            //     }
+            // }
 
-            return false
+            // return false
+            return hasNotificationAccess(context)
+        }
+
+         private fun hasNotificationAccess(context: Context): Boolean {
+            val enabledListeners = NotificationManagerCompat.getEnabledListenerPackages(context)
+            val hasAccess = enabledListeners.contains(context.packageName)
+            Log.d("ListenerPlugin", "Notification access: $hasAccess (package: ${context.packageName})")
+            return hasAccess
         }
 
         fun openPermissionSettings(context: Context): Boolean {
