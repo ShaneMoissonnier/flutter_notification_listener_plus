@@ -121,6 +121,14 @@ class _NotificationsLogState extends State<NotificationsLog> {
 
     await NotificationsListener.stopService();
 
+    await Future.delayed(Duration(milliseconds: 800));
+
+    for (int i = 0; i < 5; i++) {
+      final isRunning = await NotificationsListener.isRunning ?? false;
+      if (!isRunning) break;
+      await Future.delayed(Duration(milliseconds: 200));
+    }
+
     setState(() {
       started = false;
       _loading = false;

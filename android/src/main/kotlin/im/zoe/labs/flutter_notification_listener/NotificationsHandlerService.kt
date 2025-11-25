@@ -115,6 +115,7 @@ class NotificationsHandlerService: MethodChannel.MethodCallHandler, Notification
                 Log.i(TAG, "stop notification handler service!")
                 disableServiceSettings(mContext)
                 stopForeground(true)
+                cleanupFlutterEngine()
                 stopSelf()
             }
             else -> {
@@ -122,6 +123,29 @@ class NotificationsHandlerService: MethodChannel.MethodCallHandler, Notification
             }
         }
         return START_STICKY
+    }
+
+    private fun cleanupFlutterEngine() {
+        Log.d(TAG, "Cleaning up Flutter engine")
+        
+        // Reset the flag
+        sServiceStarted.set(false)
+
+        // Destroy and remove from cache
+        sBackgroundFlutterEngine?.let { engine ->
+            try {
+                engine.destroy()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error destroying flutter engine: ${e.message}")
+            }
+        }
+        sBackgroundFlutterEngine = null
+        
+        // Remove from cache
+        FlutterEngineCache.getInstance().remove(FlutterNotificationListenerPlugin.FLUTTER_ENGINE_CACHE_KEY)
+        
+        // Clean up instance reference
+        instance = null
     }
 
     override fun onCreate() {
@@ -139,6 +163,9 @@ class NotificationsHandlerService: MethodChannel.MethodCallHandler, Notification
     override fun onDestroy() {
         super.onDestroy()
         Log.i(TAG, "notification listener service onDestroy")
+
+        cleanupFlutterEngine()
+
         val bdi = Intent(mContext, RebootBroadcastReceiver::class.java)
         // remove notification
         sendBroadcast(bdi)
@@ -433,7 +460,21 @@ class NotificationsHandlerService: MethodChannel.MethodCallHandler, Notification
 
     private fun getFlutterEngine(context: Context): FlutterEngine {
         var eng = FlutterEngineCache.getInstance().get(FlutterNotificationListenerPlugin.FLUTTER_ENGINE_CACHE_KEY)
-        if (eng != null) return eng
+        if (eng != null) {
+
+            if (eng.dartExecutor.isExecutingDart) {
+                Log.i(TAG, "reuse existing flutter engine from cache")
+                return eng
+            }
+
+            Log.w(TAG, "Cached engine is not executing Dart, destroying it")
+            try {
+                eng.destroy()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error destroying stale engine: ${e.message}")
+            }
+            FlutterEngineCache.getInstance().remove(FlutterNotificationListenerPlugin.FLUTTER_ENGINE_CACHE_KEY)
+        }
 
         Log.i(TAG, "flutter engine cache is null, create a new one")
         eng = FlutterEngine(context)
